@@ -1,4 +1,3 @@
-Nuget Packages to install
-
--Newtonsoft.Json
--NJsonSchema
+NuGet Packages to install
+- Newtonsoft.Json
+- NJsonSchema
