@@ -1,0 +1,22 @@
+﻿@page
+@model TestProject.Pages.MappingUi.FileUploadModel
+@{
+    ViewData["Title"] = "File Upload";
+}
+<h1>Upload JSON Files</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <div>
+        <label>Upload Source JSON Data:</label>
+        <input type="file" asp-for="SourceJsonData" />
+    </div>
+    <div>
+        <label>Upload Source JSON Schema:</label>
+        <input type="file" asp-for="SourceJsonSchema" />
+    </div>
+    <div>
+        <label>Upload Target JSON Schema:</label>
+        <input type="file" asp-for="TargetJsonSchema" />
+    </div>
+    <button type="submit">Upload</button>
+</form>

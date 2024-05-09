@@ -1,0 +1,379 @@
+﻿@page
+@model TestProject.Pages.MappingUi.MapFieldsModel
+@using TestProject.Pages.MappingUi
+@using Microsoft.AspNetCore.Html
+@using System.Threading.Tasks
+@using Newtonsoft.Json
+
+@{
+    ViewData["Title"] = "Map Fields";
+}
+
+<h2>Map Fields</h2>
+
+<head>
+    <title>Display Data</title>
+</head>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .left {
+        width: 1000px;
+        float: left;
+    }
+
+    .right {
+        width: 1000px;
+        float: right;
+    }
+</style>
+
+<style>
+    .text-toggle[aria-expanded=false] .text-expanded {
+        display: none;
+    }
+
+    .text-toggle[aria-expanded=true] .text-collapsed {
+        display: none;
+    }
+</style>
+
+<form method="post">
+    <body>
+        <div class="container">
+            <div class="left">
+               <h3>Schema Data (fixing code to save target fields)</h3>
+                @if (Model.SourceSchemaProperties != null && Model.SourceSchemaProperties.Any())
+                {
+                    <div class="accordion" id="accordionExample">
+                        @foreach (var property in Model.SourceSchemaProperties)
+                        {
+                            @if (property.Type == "Object")
+                            {
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingNested@(property.GetHashCode())">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested@(property.GetHashCode())" aria-expanded="false" aria-controls="collapseNested@(property.GetHashCode())">
+                                            @property.Name
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNested@(property.GetHashCode())" class="accordion-collapse collapse" aria-labelledby="headingNested@(property.GetHashCode())" data-bs-parent="#nestedAccordion@(property.GetHashCode())">
+                                        <div class="accordion-body">
+                                           @*  <p><strong>Data Name:</strong> @property.Name</p>
+                                            <p><strong>Data Type:</strong> @property.Type</p>
+                                            <strong>Select TargetField:</strong>
+                                            <select asp-for="Mappings[@property.Name]" class="form-select">
+                                                @foreach (var option in Model.TargetKeys)
+                                                {
+                                                    <option value="@option">@option</option>
+                                                }
+                                            </select> *@
+
+                                            <table class="table">
+                                                <tr>
+                                                    <td>
+                                                        <strong>Data Name: </strong>@property.Name <br />
+                                                        <strong>Data Type: </strong>@property.Type
+                                                    </td>
+                                                    <td>
+                                                        Select Target Field:
+                                                        <select asp-for="Mappings[@property.Name]" class="form-select">
+                                                            <!option value=""></!option>
+                                                            @foreach (var option in Model.TargetKeys)
+                                                            {
+                                                                <option value="@option">@option</option>
+                                                            }
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+
+                                            <table class="table">
+                                                <tr>
+                                                    <th>Data Name:</th>
+                                                    <th>Data Type:</th>
+                                                    <th>Target Field:</th>
+                                                </tr>
+                                            </table>
+                                            @*@RenderNestedProperties(property.NestedProperties)*@
+                                            @RenderNestedProperties(property.NestedProperties, Newtonsoft.Json.JsonConvert.SerializeObject(Model.Mappings), Newtonsoft.Json.JsonConvert.SerializeObject(Model.TargetKeys))
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingNested@(property.GetHashCode())">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested@(property.GetHashCode())" aria-expanded="false" aria-controls="collapseNested@(property.GetHashCode())">
+                                            @property.Name
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNested@(property.GetHashCode())" class="accordion-collapse collapse" aria-labelledby="headingNested@(property.GetHashCode())" data-bs-parent="#nestedAccordion@(property.GetHashCode())">
+                                        <div class="accordion-body">
+                                            <p><strong>Data Name:</strong> @property.Name</p>
+                                            <p><strong>Data Type:</strong> @property.Value</p>
+                                            <label><strong>Select Target Field:</strong></label>
+                                            <select asp-for="Mappings[@property.Name]" class="form-select">
+                                                <!option value=""></!option>
+                                                @foreach (var option in Model.TargetKeys)
+                                                {
+                                                    <option value="@option">@option</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            //<button type="submit">Save Mapping</button>
+
+                        }
+                    </div>
+
+                }
+                else
+                {
+                    <h3>did not work</h3>
+
+                }
+            </div>
+
+
+            <div class="right">
+                <h3>Target Schema</h3>
+                @if (Model.TargetSchemaProperties != null && Model.TargetSchemaProperties.Any())
+                {
+                    <div class="accordion" id="accordionExample">
+                        @foreach (var property in Model.TargetSchemaProperties)
+                        {
+                            @if (property.Type == "Object")
+                            {
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingNested@(property.GetHashCode())">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested@(property.GetHashCode())" aria-expanded="false" aria-controls="collapseNested@(property.GetHashCode())">
+                                            @property.Name
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNested@(property.GetHashCode())" class="accordion-collapse collapse" aria-labelledby="headingNested@(property.GetHashCode())" data-bs-parent="#nestedAccordion@(property.GetHashCode())">
+                                        <div class="accordion-body">
+                                            <p><strong>Data Name:</strong> @property.Name</p>
+                                            <p><strong>Data Type:</strong> @property.Type</p>
+                                            <hr />
+
+                                            <table class="table">
+                                                <tr>
+                                                    <th>Data Name:</th>
+                                                    <th>Data Type:</th>
+                                                </tr>
+                                            </table>
+                                            @RenderNestedSchemaProperties(property.NestedProperties)
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingNested@(property.GetHashCode())">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested@(property.GetHashCode())" aria-expanded="false" aria-controls="collapseNested@(property.GetHashCode())">
+                                            @property.Name
+                                        </button>
+                                    </h2>
+                                    <div id="collapseNested@(property.GetHashCode())" class="accordion-collapse collapse" aria-labelledby="headingNested@(property.GetHashCode())" data-bs-parent="#nestedAccordion@(property.GetHashCode())">
+                                        <div class="accordion-body">
+                                            <p><strong>Data Name:</strong> @property.Name</p>
+                                            <p><strong>Data Type:</strong> @property.Type</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    </div>
+
+                }
+                else
+                {
+                    <h3>did not work</h3>
+
+                }
+            </div>
+        </div>
+    </body>
+</form>
+
+
+@functions {
+    object RenderNestedProperties(List<TestProject.Pages.MappingUi.MapFieldsModel.JsonPropertyInfo> nestedProperties, string mappingsJson, string targetKeysJson)
+    {
+        var mappings = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(mappingsJson);
+        var targetKeys = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(targetKeysJson);
+
+        <div class="accordion" id="nestedAccordion@(nestedProperties.GetHashCode())">
+            @foreach (var nestedProp in nestedProperties)
+            {
+                @if (nestedProp.Type == "Object")
+                {
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingNested@(nestedProp.GetHashCode())">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested@(nestedProp.GetHashCode())" aria-expanded="true" aria-controls="collapseNested@(nestedProp.GetHashCode())">
+                                @nestedProp.Name
+                            </button>
+                        </h2>
+                        <div id="collapseNested@(nestedProp.GetHashCode())" class="accordion-collapse collapse show" aria-labelledby="headingNested@(nestedProp.GetHashCode())" data-bs-parent="#nestedAccordion@(nestedProperties.GetHashCode())">
+                            <div class="accordion-body">
+                               @* <p><strong>Data Name:</strong> @nestedProp.Name</p>
+                                <p><strong>Data Type:</strong> @nestedProp.Type</p>
+                                <label><strong>Select Target Field:</strong></label>
+                                <select name="Mappings[@nestedProp.Name]" class="form-select">
+
+                                    @foreach (var option in Model.TargetKeys)
+                                    {
+                                        @*<option value="@option">@option</option>*@@*
+
+                                    }
+                                </select>*@
+
+                                <table class="table">
+                                    <tr>
+                                        <td>
+                                            <strong>Data Name: </strong>@nestedProp.Name <br />
+                                            <strong>Data Type: </strong>@nestedProp.Type
+                                        </td>
+                                        <td>
+                                            Select Target Field:
+                                            <select name="Mappings[@nestedProp.Name]" class="form-select">
+                                                <!option value=""></!option>
+                                                @foreach (var option in Model.TargetKeys)
+                                                {
+                                                    <!option value="@option">@option</!option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="table">
+                                    <tr>
+                                        <th>Data Name:</th>
+                                        <th>Data Type:</th>
+                                        <th>Target Field</th>
+                                    </tr>
+                                </table>
+                                @RenderNestedProperties(nestedProp.NestedProperties, Newtonsoft.Json.JsonConvert.SerializeObject(Model.Mappings), Newtonsoft.Json.JsonConvert.SerializeObject(Model.TargetKeys))
+
+
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <table class="table">
+                        <tr>
+                            <td>@nestedProp.Name</td>
+                            <td>@nestedProp.Type</td>
+                            <td>
+                                <select name="Mappings[@nestedProp.Name]" class="form-select">
+                                    <!option value=""></!option>
+                                    @foreach (var option in Model.TargetKeys)
+                                    {
+                                        <!option value="@option">@option</!option>
+
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                }
+            }
+        </div>
+        return null;
+    }
+}
+
+ @functions {
+    object RenderNestedSchemaProperties(List<TestProject.Pages.MappingUi.MapFieldsModel.JsonPropertyInfo> nestedProperties)
+    {
+        <div class="accordion" id="nestedAccordion@(nestedProperties.GetHashCode())">
+            @foreach (var nestedProp in nestedProperties)
+            {
+                @if (nestedProp.Type == "Object")
+                {
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingNested@(nestedProp.GetHashCode())">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested@(nestedProp.GetHashCode())" aria-expanded="true" aria-controls="collapseNested@(nestedProp.GetHashCode())">
+                                @nestedProp.Name
+                            </button>
+                        </h2>
+                        <div id="collapseNested@(nestedProp.GetHashCode())" class="accordion-collapse collapse show" aria-labelledby="headingNested@(nestedProp.GetHashCode())" data-bs-parent="#nestedAccordion@(nestedProperties.GetHashCode())">
+                            <div class="accordion-body">
+                                <p><strong>Data Name:</strong> @nestedProp.Name</p>
+                                <p><strong>Data Type:</strong> @nestedProp.Value</p>
+                                <hr />
+                                <table class="table">
+                                    <tr>
+                                        <th>Data Name:</th>
+                                        <th>Data Type:</th>
+                                    </tr>
+                                </table>
+                                @RenderNestedSchemaProperties(nestedProp.NestedProperties)
+
+
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <table class="table">
+                        <tr>
+                            <td>@nestedProp.Name</td>
+                            <td>@nestedProp.Value</td>
+                        </tr>
+                    </table>
+                }
+            }
+        </div>
+        return null;
+    }
+}
+
+<h3>Map Data</h3>
+<div class="accordion-item">
+    <h2 class="accordion-header" id="">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNested" aria-expanded="false" aria-controls="collapseNested">
+            Working Mapping Ui
+        </button>
+    </h2>
+    <div id="collapseNested" class="accordion-collapse collapse" aria-labelledby="headingNested" data-bs-parent="#nestedAccordion">
+        <div class="accordion-body">
+            <form method="post">
+                @foreach (var key in Model.Mappings.Keys.ToList())
+                {
+                    <div>
+                        <label>@key</label>
+                        <select asp-for="Mappings[@key]" name="Mappings[@key]">
+                            <option value=""></option>
+                            @foreach (var option in Model.TargetKeys)
+                            {
+                                <option value="@option" selected="@(Model.Mappings[key] == option ? "selected" : null)">@option</option>
+                            }
+                        </select>
+                    </div>
+                }
+                <button type="submit">Create JSON</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
